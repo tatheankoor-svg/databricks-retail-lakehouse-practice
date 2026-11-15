@@ -30,3 +30,4 @@ JOIN workspace.default.products AS p USING (product_id)
 JOIN workspace.default.customers AS c USING (customer_id)
 GROUP BY c.city
 ORDER BY revenue DESC;
+

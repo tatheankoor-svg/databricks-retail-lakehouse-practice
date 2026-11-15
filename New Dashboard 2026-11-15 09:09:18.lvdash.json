@@ -1,0 +1,91 @@
+{
+  "datasets": [
+    {
+      "name": "029bebce",
+      "displayName": "Highest Value Order",
+      "queryLines": [
+        "SELECT\r\n",
+        "  o.order_id,\r\n",
+        "  c.name AS customer,\r\n",
+        "  p.product_name,\r\n",
+        "  o.quantity,\r\n",
+        "  p.unit_price,\r\n",
+        "  ROUND(o.quantity * p.unit_price, 2) AS order_value\r\n",
+        "FROM workspace.default.orders AS o\r\n",
+        "JOIN workspace.default.customers AS c\r\n",
+        "  ON o.customer_id = c.customer_id\r\n",
+        "JOIN workspace.default.products AS p\r\n",
+        "  ON o.product_id = p.product_id\r\n",
+        "ORDER BY order_value DESC\r\n",
+        "LIMIT 5;"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "981c31e2",
+      "displayName": "Highest Value order",
+      "layout": [
+        {
+          "widget": {
+            "name": "170e760d",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "029bebce",
+                  "fields": [
+                    {
+                      "name": "product_name",
+                      "expression": "`product_name`"
+                    },
+                    {
+                      "name": "unit_price",
+                      "expression": "`unit_price`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "unit_price",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 9
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
