@@ -1,23 +1,33 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # Retail Lakehouse Practice: CSV -> Bronze Delta -> cleaned Silver Delta -> sales summary
 # Before running, set the three file paths and catalog/schema below.
 
 # COMMAND ----------
+
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 
 # Update these paths to match where you uploaded the CSVs.
-CUSTOMERS_PATH = "/Volumes/main/default/retail_practice/customers.csv"
-PRODUCTS_PATH = "/Volumes/main/default/retail_practice/products.csv"
-ORDERS_PATH = "/Volumes/main/default/retail_practice/orders.csv"
+CUSTOMERS_PATH = "file:/Workspace/Users/tatheankoor@gmail.com/databricks-retail-lakehouse-practice/data/customers.csv"
+PRODUCTS_PATH = "file:/Workspace/Users/tatheankoor@gmail.com/databricks-retail-lakehouse-practice/data/products.csv"
+ORDERS_PATH = "file:/Workspace/Users/tatheankoor@gmail.com/databricks-retail-lakehouse-practice/data/orders.csv"
 
 # Update these to a catalog and schema where you can create tables.
-CATALOG = "main"
+CATALOG = "workspace"
 SCHEMA = "default"
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.{SCHEMA}")
 
 # COMMAND ----------
+
+spark.sql("SHOW CATALOGS").show(truncate=False)
+
+# COMMAND ----------
+
 def read_csv(path):
     return (spark.read
             .option("header", True)
@@ -38,6 +48,7 @@ orders_raw = read_csv(ORDERS_PATH)
  .saveAsTable(f"{CATALOG}.{SCHEMA}.orders_bronze"))
 
 # COMMAND ----------
+
 # Clean types, remove incomplete records, and keep one row per business key.
 customers = (customers_raw
     .select(F.col("customer_id").cast("long").alias("customer_id"),
@@ -73,6 +84,7 @@ orders = (orders.join(customers.select("customer_id"), "customer_id", "inner")
                 .join(products.select("product_id"), "product_id", "inner"))
 
 # COMMAND ----------
+
 for name, df in [("customers", customers), ("products", products), ("orders", orders)]:
     (df.write.format("delta").mode("overwrite")
        .saveAsTable(f"{CATALOG}.{SCHEMA}.{name}"))
@@ -90,6 +102,11 @@ sales = (orders.join(products, "product_id")
  .saveAsTable(f"{CATALOG}.{SCHEMA}.sales_by_category"))
 
 # COMMAND ----------
+
+display(spark.table("workspace.default.sales_by_category"))
+
+# COMMAND ----------
+
 # Inspect outputs and row counts.
 display(sales)
 

@@ -1,13 +1,13 @@
 -- Run after module5_retail_lakehouse.py creates the tables.
--- Change main.default if your notebook used a different catalog/schema.
+-- Change workspace.default if your notebook used a different catalog/schema.
 
 -- Revenue and order count by product category.
 SELECT
   p.category,
   CAST(SUM(o.quantity * p.unit_price) AS DECIMAL(12, 2)) AS revenue,
   COUNT(DISTINCT o.order_id) AS order_count
-FROM main.default.orders AS o
-JOIN main.default.products AS p USING (product_id)
+FROM workspace.default.orders AS o
+JOIN workspace.default.products AS p USING (product_id)
 GROUP BY p.category
 ORDER BY revenue DESC;
 
@@ -15,8 +15,8 @@ ORDER BY revenue DESC;
 SELECT
   DATE_TRUNC('MONTH', o.order_date) AS order_month,
   CAST(SUM(o.quantity * p.unit_price) AS DECIMAL(12, 2)) AS revenue
-FROM main.default.orders AS o
-JOIN main.default.products AS p USING (product_id)
+FROM workspace.default.orders AS o
+JOIN workspace.default.products AS p USING (product_id)
 GROUP BY DATE_TRUNC('MONTH', o.order_date)
 ORDER BY order_month;
 
@@ -25,8 +25,8 @@ SELECT
   c.city,
   CAST(SUM(o.quantity * p.unit_price) AS DECIMAL(12, 2)) AS revenue,
   COUNT(DISTINCT o.order_id) AS order_count
-FROM main.default.orders AS o
-JOIN main.default.products AS p USING (product_id)
-JOIN main.default.customers AS c USING (customer_id)
+FROM workspace.default.orders AS o
+JOIN workspace.default.products AS p USING (product_id)
+JOIN workspace.default.customers AS c USING (customer_id)
 GROUP BY c.city
 ORDER BY revenue DESC;
